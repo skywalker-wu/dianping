@@ -8,13 +8,14 @@ key="/J3rUIw92KxHbgkyrlSg1ii4dH954IjEPSiK6bK0QtLKuuodMADinBDWrxOaMi5OiD4jRwQIiyj
 AzureStorage.Init(name, key)
 AzureStorage.EnsureTable("topshops")
 
-def GetTopShops():
+def GetTopShops(city):
   ret = []
 
-  topUrlTemplete="http://dpindex.dianping.com/dpindex?category=10&region=&type=rank&city=1&p=%d"
+  topUrlTemplete="http://dpindex.dianping.com/dpindex?category=10&region=&type=rank&city=%d&p=%d"
   for pIndex in range(1, 51):
-    ret += ParseShopInfo(HttpClient.Get(topUrlTemplete % pIndex))
-
+    ret += ParseShopInfo(HttpClient.Get(topUrlTemplete % (city, pIndex)))
+  for shop in ret:
+    shop["city"]=city
   return ret
 
 def ParseShopInfo(text):
@@ -26,9 +27,9 @@ def ParseShopInfo(text):
     id = int(re.search("\d+", href).group())
     name = li.find("div", {"class":"field-name"}).text
     rank = int(li.find("span", {"class":"ranknum"}).text)
-    ret.append({"id":id, "href":href, "name":name})
+    ret.append({"id":id, "href":href, "name":name, "rank":rank})
 
   return ret
 
 def UpdateShop(shop):
-  AzureStorage.Update(shop['id'], shop['id'], shop)
+  AzureStorage.Update(shop['city'], '%d_%d' % (shop["city"], shop['rank']), shop)
