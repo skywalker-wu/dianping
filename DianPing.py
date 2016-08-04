@@ -33,3 +33,13 @@ def ParseShopInfo(text):
 
 def UpdateShop(shop):
   AzureStorage.Update(shop['city'], '%d_%d' % (shop["city"], shop['rank']), shop)
+
+def ListShops(city):
+  for entity in AzureStorage.Query("PartitionKey eq '%d'" % city):
+    id = entity["id"]
+    href = entity["href"]
+    name = entity["name"]
+    rank = entity["rank"]
+    city = entity["city"]
+    yield {"id":id, "href":href, "name":name, "rank":rank, "city":city}
+

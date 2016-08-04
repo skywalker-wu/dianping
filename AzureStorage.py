@@ -37,5 +37,6 @@ def Update(pkey, rkey, entity):
   entity['RowKey']=rkey
   table_service.insert_or_replace_entity(table_name, entity)
 
+def Query(filter_str):
+  return table_service.query_entities(table_name, filter=filter_str)
 
-  
